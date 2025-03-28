@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>StarkTech System Monitor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h1>System Monitor</h1>
+    <div class="hex-container">
+
+      <div class="flip-card">
+        <div class="flip-inner">
+          <div class="card front">
+            <i class="fas fa-microchip"></i>
+            <h2>CPU Temp</h2>
+          </div>
+          <div class="card back">
+            <p id="cpu-temp">Loading...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card">
+        <div class="flip-inner">
+          <div class="card front">
+            <i class="fas fa-memory"></i>
+            <h2>Memory</h2>
+          </div>
+          <div class="card back">
+            <p id="memory">Loading...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card">
+        <div class="flip-inner">
+          <div class="card front">
+            <i class="fas fa-hdd"></i>
+            <h2>Disk</h2>
+          </div>
+          <div class="card back">
+            <p id="disk">Loading...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card">
+        <div class="flip-inner">
+          <div class="card front">
+            <i class="fas fa-network-wired"></i>
+            <h2>Network</h2>
+          </div>
+          <div class="card back">
+            <p id="network">Loading...</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    async function fetchData() {
+      const res = await fetch("/api/system");
+      const data = await res.json();
+
+      document.getElementById("cpu-temp").innerText = data.cpu_temp
+        ? `${data.cpu_temp.toFixed(1)}°C`
+        : "N/A";
+      document.getElementById("memory").innerText = `${(data.memory.used / 1e9).toFixed(2)} GB / ${(data.memory.total / 1e9).toFixed(2)} GB (${data.memory.percent}%)`;
+      document.getElementById("disk").innerText = `${(data.disk.used / 1e9).toFixed(2)} GB / ${(data.disk.total / 1e9).toFixed(2)} GB (${data.disk.percent}%)`;
+      document.getElementById("network").innerText = `Sent: ${(data.network.bytes_sent / 1e6).toFixed(2)} MB | Received: ${(data.network.bytes_recv / 1e6).toFixed(2)} MB`;
+    }
+
+    fetchData();
+    setInterval(fetchData, 1000);
+  </script>
+</body>
+</html>
